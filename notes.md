@@ -1,0 +1,5 @@
+taxa de positivos:
+y
+0   0.7087
+1   0.2913
+
