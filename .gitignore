@@ -1,0 +1,21 @@
+# Ambiente virtual
+venv/
+
+# Dados
+data/raw/
+data/processed/
+
+# Python
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDEs
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db
