@@ -2,8 +2,10 @@
 venv/
 
 # Dados
-data/raw/
-data/processed/
+data/raw/dataset.csv
+data/processed/teste_mediana.csv
+data/processed/treino_mediana.csv
+data/processed/validacao_mediana.csv
 
 # Python
 __pycache__/
