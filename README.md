@@ -133,5 +133,5 @@ A separação entre dados brutos e processados evita sobrescrita e facilita audi
 
 ## 👤 Autor
 
-Henrique Lopes da Silva
+Henrique Lopes da Silva<br>
 Projeto desenvolvido como parte de um desafio técnico de Credit Scoring.
