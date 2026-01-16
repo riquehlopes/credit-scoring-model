@@ -85,17 +85,17 @@ Essas análises permitem avaliar o comportamento do modelo em diferentes períod
 credit_scoring/
 │
 ├── data/
-│   ├── raw/                                # Base original
-│   └── processed/                          # Dados tratados e transformados
+│ ├── raw/ # Base original
+│ └── processed/ # Dados tratados e transformados
 │
 ├── notebooks/
-│   ├── 01_analise_exploratoria.ipynb       # Primeira analise dos dados
-│   ├── 02_pre_processamento.ipynb          # Pré-processamento da base de dados
-│   └── 03_modelagem.ipynb                  # Modelagem e comparação de modelos
+│ ├── 01_analise_exploratoria.ipynb # Primeira análise dos dados
+│ ├── 02_pre_processamento.ipynb # Pré-processamento da base de dados
+│ └── 03_modelagem.ipynb # Modelagem e comparação de modelos
 │
 ├── src/
-│   ├── pre_processamento.py                # Funções utilizadas no pré-processamento
-│   └── modelagem.py                        # Funções utilizadas na modelagem e métricas
+│ ├── pre_processamento.py # Funções utilizadas no pré-processamento
+│ └── modelagem.py # Funções utilizadas na modelagem e métricas
 │
 ├── README.md
 └── requirements.txt
