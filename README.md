@@ -83,22 +83,21 @@ Essas análises permitem avaliar o comportamento do modelo em diferentes períod
 
 🧩 Estrutura do Projeto
 credit_scoring/
-│
-├── data/
-│ ├── raw/ # Base original
-│ └── processed/ # Dados tratados e transformados
-│
-├── notebooks/
-│ ├── 01_analise_exploratoria.ipynb # Primeira análise dos dados
-│ ├── 02_pre_processamento.ipynb # Pré-processamento da base de dados
-│ └── 03_modelagem.ipynb # Modelagem e comparação de modelos
-│
-├── src/
-│ ├── pre_processamento.py # Funções utilizadas no pré-processamento
-│ └── modelagem.py # Funções utilizadas na modelagem e métricas
-│
-├── README.md
-└── requirements.txt
+  data/
+    raw/                     # Base original
+    processed/               # Dados tratados e transformados
+
+  notebooks/
+    01_analise_exploratoria.ipynb   # Primeira análise dos dados
+    02_pre_processamento.ipynb      # Pré-processamento da base de dados
+    03_modelagem.ipynb              # Modelagem e comparação de modelos
+
+  src/
+    pre_processamento.py     # Funções utilizadas no pré-processamento
+    modelagem.py             # Funções utilizadas na modelagem e métricas
+
+  README.md
+  requirements.txt
 
 
 🔁 Reprodutibilidade
@@ -116,8 +115,12 @@ venv\Scripts\activate     # Windows
 # Instalar dependências
 pip install -r requirements.txt
 
-
 Após a instalação, adicione a base em CSV na pasta data/raw. Então os notebooks podem ser executados na ordem indicada na pasta notebooks/.
+🔎 Observações
+
+A execução dos notebooks deve seguir a ordem numérica indicada.
+As funções críticas de negócio foram modularizadas na pasta src/, garantindo melhor manutenibilidade e reprodutibilidade.
+A separação entre dados brutos e processados evita sobrescrita e facilita auditoria.
 
 
 📌 Principais Resultados
