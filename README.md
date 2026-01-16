@@ -59,6 +59,12 @@ Justificativa:
 - Estabilidade no tempo<br>
 - Facilidade de governança e manutenção<br>
 
+Parâmetros:
+
+- max_iter = 2000   | O parâmetro max_iter foi definido como 2000 para garantir a convergência do algoritmo, evitando interrupções prematuras do processo de otimização<br>
+- penalty = "l2"    | A regularização L2 foi adotada com o objetivo de reduzir overfitting<br>
+- random_state = 42 | O uso de random_state = 42 assegura a reprodutibilidade dos resultados, permitindo que o treinamento do modelo produza os mesmos coeficientes em execuções futuras.<br>
+
 
 ## 📈 Métricas de Avaliação
 
