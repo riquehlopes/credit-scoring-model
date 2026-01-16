@@ -1,37 +1,78 @@
-
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score, roc_curve
 from sklearn.model_selection import train_test_split
 import warnings
-import numpy as np
-from sklearn.linear_model import LogisticRegression
-import pandas as pd
-
 
 # -----------------------------
-# Funções de métricas
+# Funções de métricas de modelo
 # -----------------------------
 
 def ks_statistic(y_true, y_score):
     """
-    Calcula o KS (Kolmogorov-Smirnov)
+    Calcula a estatística KS (Kolmogorov-Smirnov) para modelos de classificação.
+
+    Parâmetros
+    ----------
+    y_true : array-like
+        Valores reais da variável alvo (0 ou 1).
+    y_score : array-like
+        Scores ou probabilidades estimadas pelo modelo.
+
+    Retorno
+    -------
+    float
+        Valor do KS (varia entre 0 e 1).
     """
     fpr, tpr, _ = roc_curve(y_true, y_score)
     ks = np.max(tpr - fpr)
     return ks
 
+
 def gini_coefficient(y_true, y_score):
     """
-    Calcula o Gini a partir do AUC
+    Calcula o coeficiente de Gini a partir do AUC.
+
+    Fórmula:
+        Gini = 2 * AUC - 1
+
+    Parâmetros
+    ----------
+    y_true : array-like
+        Valores reais da variável alvo.
+    y_score : array-like
+        Scores ou probabilidades do modelo.
+
+    Retorno
+    -------
+    float
+        Valor do coeficiente de Gini.
     """
     auc = roc_auc_score(y_true, y_score)
     return 2 * auc - 1
 
+
 def compute_metrics(y_true, y_score):
     """
-    Retorna AUC, KS e Gini
+    Calcula as principais métricas de avaliação de um modelo de classificação.
+
+    Métricas retornadas:
+    - AUC (Área sob a curva ROC)
+    - KS (Kolmogorov-Smirnov)
+    - Gini
+
+    Parâmetros
+    ----------
+    y_true : array-like
+        Valores reais da variável alvo.
+    y_score : array-like
+        Scores ou probabilidades estimadas pelo modelo.
+
+    Retorno
+    -------
+    dict
+        Dicionário contendo AUC, KS e Gini.
     """
     auc = roc_auc_score(y_true, y_score)
     ks = ks_statistic(y_true, y_score)
@@ -44,9 +85,30 @@ def compute_metrics(y_true, y_score):
     }
 
 
-
+# -----------------------------
+# Funções de PSI (Population Stability Index)
+# -----------------------------
 
 def psi_variavel(expected, actual, bins=10, eps=1e-6):
+    """
+    Calcula o PSI (Population Stability Index) para uma variável numérica.
+
+    Parâmetros
+    ----------
+    expected : array-like
+        Valores da variável na base de referência.
+    actual : array-like
+        Valores da variável na base comparada.
+    bins : int, opcional (default=10)
+        Número de faixas (quantis) utilizadas no cálculo.
+    eps : float, opcional (default=1e-6)
+        Valor pequeno para evitar log(0).
+
+    Retorno
+    -------
+    float
+        Valor do PSI da variável.
+    """
     breakpoints = np.percentile(expected, np.arange(0, 100, 100 / bins))
     breakpoints = np.append(breakpoints, np.inf)
 
@@ -63,12 +125,31 @@ def psi_variavel(expected, actual, bins=10, eps=1e-6):
 
     return psi
 
-import pandas as pd
 
 def psi_por_variavel_com_coef(X_train, X_other, model, bins=10):
+    """
+    Calcula o PSI de cada variável numérica e associa o coeficiente
+    correspondente de um modelo de regressão logística.
+
+    Parâmetros
+    ----------
+    X_train : pandas.DataFrame
+        Base de referência (normalmente treino/desenvolvimento).
+    X_other : pandas.DataFrame
+        Base a ser comparada (validação, OOT, produção, etc).
+    model : sklearn.linear_model.LogisticRegression
+        Modelo de regressão logística treinado.
+    bins : int, opcional (default=10)
+        Número de faixas (quantis) usadas no PSI.
+
+    Retorno
+    -------
+    pandas.DataFrame
+        DataFrame com PSI e coeficiente por variável,
+        ordenado do maior para o menor PSI.
+    """
     psi_dict = {}
 
-    # coeficientes da regressão
     coeficientes = pd.Series(
         model.coef_[0],
         index=X_train.columns
@@ -98,6 +179,25 @@ def psi_por_variavel_com_coef(X_train, X_other, model, bins=10):
 
 
 def psi_score(expected, actual, bins=10, eps=1e-6):
+    """
+    Calcula o PSI para scores do modelo.
+
+    Parâmetros
+    ----------
+    expected : array-like
+        Scores da base de referência.
+    actual : array-like
+        Scores da base comparada.
+    bins : int, opcional (default=10)
+        Número de faixas (quantis).
+    eps : float, opcional (default=1e-6)
+        Valor pequeno para evitar log(0).
+
+    Retorno
+    -------
+    float
+        Valor do PSI do score.
+    """
     breakpoints = np.percentile(expected, np.arange(0, 100, 100 / bins))
     breakpoints = np.append(breakpoints, np.inf)
 
@@ -113,115 +213,33 @@ def psi_score(expected, actual, bins=10, eps=1e-6):
     )
 
 
-
-def treinar_e_avaliar(
-        pipelines, target_col="y", 
-        max_iter=1000, 
-        random_state=42, 
-        penalty='l2',
-        resultados_existentes=None,
-        modelos_existentes=None,
-        psi_existente=None
-
-        ):
+def psi_por_safra(df, score_col, safra_col='safra'):
     """
-    Avalia um ou mais pipelines usando Regressão Logística.
-    
+    Calcula o PSI do score por safra, usando a primeira safra
+    como base de referência.
+
     Parâmetros
     ----------
-    pipelines : dict
-        Dicionário no formato:
-        {
-            "NomePipeline": (df_treino, df_validacao, df_teste)
-        }
-    target_col : str, default="y"
-        Nome da coluna alvo
+    df : pandas.DataFrame
+        DataFrame contendo score e safra.
+    score_col : str
+        Nome da coluna de score do modelo.
+    safra_col : str, opcional (default='safra')
+        Nome da coluna que identifica a safra/período.
 
-    max_iter : int, default=1000
-        Número máximo de iterações do algoritmo de otimização.
-        Valores maiores ajudam a garantir convergência, especialmente
-        quando os dados não estão bem escalados.
-
-    random_state : int, default=42
-        Semente aleatória para garantir reprodutibilidade dos resultados.
-        Garante que o treinamento produza os mesmos coeficientes
-        em execuções diferentes.
-
-    penalty : str, default='l2'
-        Tipo de regularização aplicada ao modelo.
-    
     Retorno
     -------
-    dict
-        Resultados por pipeline (DataFrame de métricas)
+    pandas.Series
+        Série com o PSI do score para cada safra.
     """
+    safras = sorted(df[safra_col].unique())
+    base_safra = safras[0]
     
-    resultado_metricas = resultados_existentes or {}
-    modelos_finais = modelos_existentes or {}
-    psi_resultados = psi_existente or {}
-
-    for nome, (df_train, df_valid, df_test) in pipelines.items():
-
-        # if nome in resultado_metricas:
-        #     warnings.warn(f"⚠️ Pipeline '{nome}' já existe — será sobrescrito.")
-        #     continue
-
-        X_train = df_train.drop(columns=[target_col, 'safra', 'id'])
-        y_train = df_train[target_col]
-
-        X_valid = df_valid.drop(columns=[target_col, 'safra', 'id'])
-        y_valid = df_valid[target_col]
-
-        X_test = df_test.drop(columns=[target_col, 'safra', 'id'])
-        y_test = df_test[target_col]
-
-        model = LogisticRegression(
-            max_iter=max_iter,
-            random_state=random_state,
-            penalty=penalty
-        )
-
-        model.fit(X_train, y_train)
-
-        y_train_score = model.predict_proba(X_train)[:, 1]
-        y_valid_score = model.predict_proba(X_valid)[:, 1]
-        y_test_score  = model.predict_proba(X_test)[:, 1]
-
-        df_metricas = pd.DataFrame(
-            {
-                "Treino": compute_metrics(y_train, y_train_score),
-                "Validação": compute_metrics(y_valid, y_valid_score),
-                "Teste": compute_metrics(y_test, y_test_score),
-            }
-        ).T
-
-        print(f"\nPipeline utilizada: {nome}")
-        print(df_metricas.round(4))
-
-        psi_valid = psi_por_variavel_com_coef(X_train, X_valid, model, bins=10)
-        psi_test  = psi_por_variavel_com_coef(X_train, X_test, model,  bins=10)
-
-        psi_score_valid = psi_score(y_train_score, y_valid_score, bins=10)
-        psi_score_test  = psi_score(y_train_score, y_test_score,  bins=10)
-
-
-        resultado_metricas[nome] = df_metricas
-        modelos_finais[nome] = model
-        psi_resultados[nome] = {
-            "variaveis": {
-                "treino_val": psi_valid,
-                "treino_teste": psi_test,
-            },
-            "score": {
-                "treino_val": psi_score_valid,
-                "treino_teste": psi_score_test,
-            },
-        }
-
-    return resultado_metricas, modelos_finais, psi_resultados
-
-
-
-import numpy as np
-import pandas as pd
-
+    base_scores = df[df[safra_col] == base_safra][score_col]
+    
+    psi_values = {}
+    for safra in safras:
+        current_scores = df[df[safra_col] == safra][score_col]
+        psi_values[safra] = psi_variavel(base_scores, current_scores)
+    
+    return pd.Series(psi_values)
