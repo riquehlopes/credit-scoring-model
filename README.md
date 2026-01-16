@@ -88,22 +88,22 @@ Essas análises permitem avaliar o comportamento do modelo em diferentes períod
 
 
 ## Estrutura do Projeto
-credit_scoring/
-  data/
-    raw/                     # Base original
-    processed/               # Dados tratados e transformados
+credit_scoring/<br>
+  data/<br>
+    raw/                     # Base original<br>
+    processed/               # Dados tratados e transformados<br><br>
 
-  notebooks/
-    01_analise_exploratoria.ipynb   # Primeira análise dos dados
-    02_pre_processamento.ipynb      # Pré-processamento da base de dados
-    03_modelagem.ipynb              # Modelagem e comparação de modelos
+  notebooks/<br>
+    01_analise_exploratoria.ipynb   # Primeira análise dos dados<br>
+    02_pre_processamento.ipynb      # Pré-processamento da base de dados<br>
+    03_modelagem.ipynb              # Modelagem e comparação de modelos<br><br>
 
-  src/
-    pre_processamento.py     # Funções utilizadas no pré-processamento
-    modelagem.py             # Funções utilizadas na modelagem e métricas
+  src/<br>
+    pre_processamento.py     # Funções utilizadas no pré-processamento<br>
+    modelagem.py             # Funções utilizadas na modelagem e métricas<br><br>
 
-  README.md
-  requirements.txt
+  README.md<br>
+  requirements.txt<br>
 
 
 ## Reprodutibilidade
